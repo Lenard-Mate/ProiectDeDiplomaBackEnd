@@ -1,6 +1,7 @@
 package ro.edu.UTCNBM.moneyManager;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,10 +35,6 @@ public class Controller {
 	@Autowired
 	ReceiptRepository ReceiptRepositoryData;
 
-
-	
-	
-	
 
 	@PostMapping(value = "/saveNewUser")
 	public User saveUser(@RequestBody final User myuser) {
@@ -86,8 +83,8 @@ public class Controller {
 	}
 	
 	
-	@GetMapping(value = "getReceipt")
-	public List<Receipt> getValuesOfReceipt() {
+	@PostMapping(value = "getReceipt")
+	public List<Receipt> getValuesOfReceipt(@RequestBody final Validation userId) {
 
 		
 		
@@ -120,8 +117,22 @@ public class Controller {
 		
 		
 		java.util.List<Receipt> receipts = ReceiptRepositoryData.findAll();
+		java.util.List<Receipt> userReceipts = new ArrayList<Receipt>();
 		
-		Collections.sort(receipts, new Comparator<Receipt>() {
+		
+		
+		for(int i =0;i<receipts.size();i++) {
+			
+			if (receipts.get(i).getUserId().equals(userId.getNumberId())) {
+				
+				
+				userReceipts.add(receipts.get(i));
+				System.out.println(receipts.get(i));
+			}
+		}
+		
+		
+		Collections.sort(userReceipts, new Comparator<Receipt>() {
             @Override
             public int compare(Receipt r1, Receipt r2) {
                 return r1.getDate().compareTo(r2.getDate());
@@ -129,9 +140,20 @@ public class Controller {
         });
 		
 		
-		return receipts;
+		return userReceipts;
 	}
 	
 	
 
+	@PostMapping(value = "/setReceipt")
+	public Validation setReceipt(@RequestBody final Receipt receipt) {
+		System.out.println(receipt.getTotal());
+		
+		Validation validation =new Validation();
+		validation.setMessage("All is good");
+		ReceiptRepositoryData.save(receipt);
+		
+		return validation;
+	}
+	
 }

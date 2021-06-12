@@ -19,7 +19,7 @@ public class Receipt {
 	@Column(nullable = false, unique = false)
     private Long userId;
      
-    @Column(nullable = true, length = 64)
+    @Column(nullable = true, length = 10000)
     private String receiptValue;
      
     @Column(name = "total", nullable = false, length = 20)
