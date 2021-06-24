@@ -100,6 +100,11 @@ public class Controller {
 
 		return ReceiptRepositoryData.findAll();
 	}
+	@GetMapping(value = "/sameChart")
+	public List<Receipt> anotherChart() {
+
+		return ReceiptRepositoryData.findAll();
+	}
 
 	@PostMapping(value = "/GetPassowrd")
 	public Validation getUserPassword(@RequestBody final User myUser) {
