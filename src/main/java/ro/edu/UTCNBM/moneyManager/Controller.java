@@ -105,6 +105,12 @@ public class Controller {
 
 		return ReceiptRepositoryData.findAll();
 	}
+	@GetMapping(value = "/sameChart")
+	public String suntMate() {
+
+		return "sunt mate";
+	}
+
 
 	@PostMapping(value = "/GetPassowrd")
 	public Validation getUserPassword(@RequestBody final User myUser) {
