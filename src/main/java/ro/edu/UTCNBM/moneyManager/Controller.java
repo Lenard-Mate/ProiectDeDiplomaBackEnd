@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ro.edu.UTCNBM.moneyManager.Component.Receipt;
+import ro.edu.UTCNBM.moneyManager.Component.ResetPassword;
 import ro.edu.UTCNBM.moneyManager.Component.User;
 import ro.edu.UTCNBM.moneyManager.Component.Validation;
 import ro.edu.UTCNBM.moneyManager.Repository.ReceiptRepository;
 import ro.edu.UTCNBM.moneyManager.Repository.UserRepository;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 
 public class Controller {
 
@@ -55,7 +57,7 @@ public class Controller {
 		java.util.List<User> customers = userRepository.findAll();
 
 		for (int i = 0; i < customers.size(); i++) {
-			if (customers.get(i).getEmail().equals(myuser.getEmail())) {
+			if (customers.get(i).getEmail().equals(myuser.getEmail()) && customers.get(i).getPassword().equals(myuser.getPassword())) {
 				validation.setValidation(true);
 				validation.setNumberId(customers.get(i).getId());
 				validation.setMessage("Valid");
@@ -71,9 +73,7 @@ public class Controller {
 
 	@PostMapping(value = "/Receipt")
 	public String saveReceipt(@RequestBody final Receipt myReceipt) {
-
 		ReceiptRepositoryData.save(myReceipt);
-
 		return "dataSaved";
 	}
 
@@ -101,7 +101,7 @@ public class Controller {
 				SimpleMailMessage myemail = new SimpleMailMessage();
 				myemail.setTo(myUser.getEmail());
 				myemail.setSubject("Your  Password:");
-				myemail.setText(customers.get(i).getPassword());
+				myemail.setText("Here is your password:"+customers.get(i).getPassword());
 				javaMailSender.send(myemail);
 				myValidation.setMessage("An email was send for you to recover your password");
 
@@ -116,42 +116,13 @@ public class Controller {
 	@PostMapping(value = "getReceipt")
 	public List<Receipt> getValuesOfReceipt(@RequestBody final Validation userId) {
 
-//		Receipt monyAndTime = new Receipt();
-//		Receipt monyAndTime2 = new Receipt();
-//		Receipt monyAndTime3 = new Receipt();
-//		Receipt monyAndTime4 = new Receipt();
-//		Receipt monyAndTime5 = new Receipt();
-//		Receipt monyAndTime6 = new Receipt();
-//		Receipt monyAndTime7 = new Receipt();
-//		Receipt monyAndTime8 = new Receipt();
-//		Receipt monyAndTime9 = new Receipt();
-//
-//		monyAndTime.setDate("2020/03/04");
-//		monyAndTime.setTotal(32422);
-//		
-//		monyAndTime2.setDate("2020/04/04");
-//		monyAndTime2.setTotal(52422);
-//		
-//		monyAndTime3.setDate("2020/05/04");
-//		monyAndTime3.setTotal(62422);
-//		
-//		monyAndTime4.setDate("2020/06/04");
-//		monyAndTime4.setTotal(72422);
-//		
-//		monyAndTime5.setDate("2020/07/04");
-//		monyAndTime5.setTotal(82422);
-//		
-//		return Arrays.asList(monyAndTime, monyAndTime2, monyAndTime3, monyAndTime3, monyAndTime4, monyAndTime5);
-
 		java.util.List<Receipt> receipts = ReceiptRepositoryData.findAll();
 		java.util.List<Receipt> userReceipts = new ArrayList<Receipt>();
 
 		for (int i = 0; i < receipts.size(); i++) {
 
 			if (receipts.get(i).getUserId().equals(userId.getNumberId())) {
-
 				userReceipts.add(receipts.get(i));
-				System.out.println(receipts.get(i));
 			}
 		}
 
@@ -167,11 +138,38 @@ public class Controller {
 
 	@PostMapping(value = "/setReceipt")
 	public Validation setReceipt(@RequestBody final Receipt receipt) {
-		System.out.println(receipt.getTotal());
 
 		Validation validation = new Validation();
 		validation.setMessage("All is good");
 		ReceiptRepositoryData.save(receipt);
+
+		return validation;
+	}
+
+	@PostMapping(value = "/delteReceipt")
+	public Validation deleteReceipt(@RequestBody final Receipt receipt) {
+
+		Validation validation = new Validation();
+		validation.setMessage("Was Deleted");
+		ReceiptRepositoryData.deleteById(receipt.getId());
+
+		return validation;
+	}
+
+	@PostMapping(value = "/updateReceipt")
+	public Validation updateReceipt(@RequestBody final ResetPassword userData) {
+
+		Validation validation = new Validation();
+		User myUser = userRepository.findById(userData.getId()).get();
+		
+		if (myUser.getPassword().equals(userData.getOldPassword())) {
+			myUser.setPassword(userData.getNewPassword());
+			userRepository.save(myUser);
+
+			validation.setMessage("User Password was uppdated!");
+		} else {
+			validation.setMessage("Wrong original password");
+		}
 
 		return validation;
 	}
