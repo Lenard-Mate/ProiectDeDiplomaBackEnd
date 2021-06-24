@@ -43,12 +43,23 @@ public class Controller {
 
 	@PostMapping(value = "/saveNewUser")
 	public User saveUser(@RequestBody final User myuser) {
+		myuser.setEmail(encriptionDecription(myuser.getEmail(),3));
+		myuser.setPassword(encriptionDecription(myuser.getPassword(),3));
 		userRepository.save(myuser);
+		
 		myuser.setEmail("dataSaved");
 		myuser.setPassword("");
 		return myuser;
 	}
 
+	@PostMapping(value = "/getusers")
+	public User getusers(@RequestBody final User myuser) {
+		
+		User myUser = userRepository.findById(myuser.getId()).get();
+		myUser.setEmail(encriptionDecription(myUser.getEmail(),-3));
+		return myUser;
+	}
+	
 	@PostMapping(value = "/LogIn")
 	public Validation findUser(@RequestBody final User myuser) {
 
@@ -57,7 +68,8 @@ public class Controller {
 		java.util.List<User> customers = userRepository.findAll();
 
 		for (int i = 0; i < customers.size(); i++) {
-			if (customers.get(i).getEmail().equals(myuser.getEmail()) && customers.get(i).getPassword().equals(myuser.getPassword())) {
+			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myuser.getEmail())
+					&& encriptionDecription(customers.get(i).getPassword(),-3).equals(myuser.getPassword())) {
 				validation.setValidation(true);
 				validation.setNumberId(customers.get(i).getId());
 				validation.setMessage("Valid");
@@ -96,15 +108,17 @@ public class Controller {
 		java.util.List<User> customers = userRepository.findAll();
 
 		for (int i = 0; i < customers.size(); i++) {
-			if (customers.get(i).getEmail().equals(myUser.getEmail())) {
+			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myUser.getEmail())) {
 
 				SimpleMailMessage myemail = new SimpleMailMessage();
 				myemail.setTo(myUser.getEmail());
 				myemail.setSubject("Your  Password:");
-				myemail.setText("Here is your password:"+customers.get(i).getPassword());
+				myemail.setText("Here is your password:"+encriptionDecription(customers.get(i).getPassword(),-3));
 				javaMailSender.send(myemail);
 				myValidation.setMessage("An email was send for you to recover your password");
 
+			}else {
+				myValidation.setMessage("This e-mail does not exist");
 			}
 		}
 
@@ -156,14 +170,14 @@ public class Controller {
 		return validation;
 	}
 
-	@PostMapping(value = "/updateReceipt")
-	public Validation updateReceipt(@RequestBody final ResetPassword userData) {
+	@PostMapping(value = "/updatePassword")
+	public Validation updatePassword(@RequestBody final ResetPassword userData) {
 
 		Validation validation = new Validation();
 		User myUser = userRepository.findById(userData.getId()).get();
 		
-		if (myUser.getPassword().equals(userData.getOldPassword())) {
-			myUser.setPassword(userData.getNewPassword());
+		if (encriptionDecription(myUser.getPassword(),-3).equals(userData.getOldPassword())) {
+			myUser.setPassword(encriptionDecription(userData.getNewPassword(),3));
 			userRepository.save(myUser);
 
 			validation.setMessage("User Password was uppdated!");
@@ -173,5 +187,20 @@ public class Controller {
 
 		return validation;
 	}
+	
+	static String encriptionDecription(String msg, int shift){
+	    String s = "";
+	    int len = msg.length();
+	    for(int x = 0; x < len; x++){
+	        char c = (char)(msg.charAt(x) + shift);
+	        if (c > 'z')
+	            s += (char)(msg.charAt(x) - (26-shift));
+	        else
+	            s += (char)(msg.charAt(x) + shift);
+	    }
+	    return s;
+	}
+	
+	//System.out.println(cipher("eu sunt mate imi pare bine am un ardon#@ 98", 3));  //prints def
 
 }
