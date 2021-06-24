@@ -105,7 +105,7 @@ public class Controller {
 
 		return ReceiptRepositoryData.findAll();
 	}
-	@GetMapping(value = "/sameChart")
+	@GetMapping(value = "/mateChart")
 	public String suntMate() {
 
 		return "sunt mate";
