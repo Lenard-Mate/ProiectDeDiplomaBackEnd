@@ -28,7 +28,7 @@ import ro.edu.UTCNBM.moneyManager.Repository.ReceiptRepository;
 import ro.edu.UTCNBM.moneyManager.Repository.UserRepository;
 
 @RestController
-@CrossOrigin(origins = "https://moneymanagementapp.herokuapp.com")
+//@CrossOrigin(origins = "https://moneymanagementapp.herokuapp.com")
 
 public class Controller {
 
