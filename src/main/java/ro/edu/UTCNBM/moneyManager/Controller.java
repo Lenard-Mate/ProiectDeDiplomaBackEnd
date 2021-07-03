@@ -42,14 +42,25 @@ public class Controller {
 	public JavaMailSender javaMailSender;
 
 	@PostMapping(value = "/saveNewUser")
-	public User saveUser(@RequestBody final User myuser) {
+	public Validation saveUser(@RequestBody final User myuser) {
+		Validation validation = new Validation();
+
+		java.util.List<User> customers = userRepository.findAll();
+		
+		for (int i = 0; i < customers.size(); i++) {
+			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myuser.getEmail())) {
+				validation.setMessage("Exist");
+				return validation;
+			}
+
+		}
+		
 		myuser.setEmail(encriptionDecription(myuser.getEmail(),3));
 		myuser.setPassword(encriptionDecription(myuser.getPassword(),3));
 		userRepository.save(myuser);
-		
-		myuser.setEmail("dataSaved");
-		myuser.setPassword("");
-		return myuser;
+	
+		validation.setMessage("NotExist");
+		return validation;
 	}
 
 	@PostMapping(value = "/getusers")
