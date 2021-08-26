@@ -46,31 +46,31 @@ public class Controller {
 		Validation validation = new Validation();
 
 		java.util.List<User> customers = userRepository.findAll();
-		
+
 		for (int i = 0; i < customers.size(); i++) {
-			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myuser.getEmail())) {
+			if (encriptionDecription(customers.get(i).getEmail(), -3).equals(myuser.getEmail())) {
 				validation.setMessage("Exist");
 				return validation;
 			}
 
 		}
-		
-		myuser.setEmail(encriptionDecription(myuser.getEmail(),3));
-		myuser.setPassword(encriptionDecription(myuser.getPassword(),3));
+
+		myuser.setEmail(encriptionDecription(myuser.getEmail(), 3));
+		myuser.setPassword(encriptionDecription(myuser.getPassword(), 3));
 		userRepository.save(myuser);
-	
+
 		validation.setMessage("NotExist");
 		return validation;
 	}
 
 	@PostMapping(value = "/getusers")
 	public User getusers(@RequestBody final User myuser) {
-		
+
 		User myUser = userRepository.findById(myuser.getId()).get();
-		myUser.setEmail(encriptionDecription(myUser.getEmail(),-3));
+		myUser.setEmail(encriptionDecription(myUser.getEmail(), -3));
 		return myUser;
 	}
-	
+
 	@PostMapping(value = "/LogIn")
 	public Validation findUser(@RequestBody final User myuser) {
 
@@ -79,8 +79,8 @@ public class Controller {
 		java.util.List<User> customers = userRepository.findAll();
 
 		for (int i = 0; i < customers.size(); i++) {
-			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myuser.getEmail())
-					&& encriptionDecription(customers.get(i).getPassword(),-3).equals(myuser.getPassword())) {
+			if (encriptionDecription(customers.get(i).getEmail(), -3).equals(myuser.getEmail())
+					&& encriptionDecription(customers.get(i).getPassword(), -3).equals(myuser.getPassword())) {
 				validation.setValidation(true);
 				validation.setNumberId(customers.get(i).getId());
 				validation.setMessage("Valid");
@@ -111,17 +111,18 @@ public class Controller {
 
 		return ReceiptRepositoryData.findAll();
 	}
+
 	@GetMapping(value = "/sameChart")
 	public List<Receipt> anotherChart() {
 
 		return ReceiptRepositoryData.findAll();
 	}
+
 	@GetMapping(value = "/mateChart")
 	public String suntMate() {
 
 		return "sunt mate";
 	}
-
 
 	@PostMapping(value = "/GetPassowrd")
 	public Validation getUserPassword(@RequestBody final User myUser) {
@@ -130,16 +131,16 @@ public class Controller {
 		java.util.List<User> customers = userRepository.findAll();
 
 		for (int i = 0; i < customers.size(); i++) {
-			if (encriptionDecription(customers.get(i).getEmail(),-3).equals(myUser.getEmail())) {
+			if (encriptionDecription(customers.get(i).getEmail(), -3).equals(myUser.getEmail())) {
 
 				SimpleMailMessage myemail = new SimpleMailMessage();
 				myemail.setTo(myUser.getEmail());
 				myemail.setSubject("Your  Password:");
-				myemail.setText("Here is your password:"+encriptionDecription(customers.get(i).getPassword(),-3));
+				myemail.setText("Here is your password:" + encriptionDecription(customers.get(i).getPassword(), -3));
 				javaMailSender.send(myemail);
 				myValidation.setMessage("An email was send for you to recover your password");
 
-			}else {
+			} else {
 				myValidation.setMessage("This e-mail does not exist");
 			}
 		}
@@ -197,9 +198,9 @@ public class Controller {
 
 		Validation validation = new Validation();
 		User myUser = userRepository.findById(userData.getId()).get();
-		
-		if (encriptionDecription(myUser.getPassword(),-3).equals(userData.getOldPassword())) {
-			myUser.setPassword(encriptionDecription(userData.getNewPassword(),3));
+
+		if (encriptionDecription(myUser.getPassword(), -3).equals(userData.getOldPassword())) {
+			myUser.setPassword(encriptionDecription(userData.getNewPassword(), 3));
 			userRepository.save(myUser);
 
 			validation.setMessage("User Password was uppdated!");
@@ -209,20 +210,21 @@ public class Controller {
 
 		return validation;
 	}
-	
-	static String encriptionDecription(String msg, int shift){
-	    String s = "";
-	    int len = msg.length();
-	    for(int x = 0; x < len; x++){
-	        char c = (char)(msg.charAt(x) + shift);
-	        if (c > 'z')
-	            s += (char)(msg.charAt(x) - (26-shift));
-	        else
-	            s += (char)(msg.charAt(x) + shift);
-	    }
-	    return s;
+
+	static String encriptionDecription(String msg, int shift) {
+		String s = "";
+		int len = msg.length();
+		for (int x = 0; x < len; x++) {
+			char c = (char) (msg.charAt(x) + shift);
+			if (c > 'z')
+				s += (char) (msg.charAt(x) - (26 - shift));
+			else
+				s += (char) (msg.charAt(x) + shift);
+		}
+		return s;
 	}
-	
-	//System.out.println(cipher("eu sunt mate imi pare bine am un ardon#@ 98", 3));  //prints def
+
+	// System.out.println(cipher("eu sunt mate imi pare bine am un ardon#@ 98", 3));
+	// //prints def
 
 }
